@@ -1,0 +1,40 @@
+<%- include('_header') %>
+
+<div class="page-head no-print">
+  <h1><%= title %></h1>
+  <button class="btn primary" onclick="window.print()">Print</button>
+</div>
+
+<div class="card doc" style="max-width:560px">
+  <div class="doc-head">
+    <%- include('_shop') %>
+    <div class="right">
+      <h1><%= pay.direction === 'in' ? 'RECEIPT' : 'PAYMENT VOUCHER' %></h1>
+      <div>No. <%= (pay.direction === 'in' ? 'RC-' : 'PV-') + pay.id %></div>
+      <div>Date: <%= pay.pay_date %></div>
+    </div>
+  </div>
+
+  <table class="plain">
+    <tr>
+      <td class="muted"><%= pay.direction === 'in' ? 'Received from' : 'Paid to' %></td>
+      <td><strong><%= pay.customer || pay.supplier || 'Walk-in customer' %></strong> <%= pay.c_phone || pay.s_phone || '' %></td>
+    </tr>
+    <tr><td class="muted">Amount</td><td><strong style="font-size:18px"><%= money(pay.amount) %></strong></td></tr>
+    <tr><td class="muted">Mode</td><td><%= pay.mode %><%= pay.reference ? ' · Ref ' + pay.reference : '' %></td></tr>
+    <tr>
+      <td class="muted">Against</td>
+      <td>
+        <% if (pay.invoice_no) { %>Invoice <%= pay.invoice_no %>
+        <% } else if (pay.job_no) { %>Grill job <%= pay.job_no %>
+        <% } else if (pay.purchase_id) { %>Purchase <%= pay.purchase_no || '#' + pay.purchase_id %>
+        <% } else { %>On account<% } %>
+      </td>
+    </tr>
+    <% if (pay.note) { %><tr><td class="muted">Note</td><td><%= pay.note %></td></tr><% } %>
+  </table>
+
+  <p style="margin-top:50px" class="right">Signature</p>
+</div>
+
+<%- include('_footer') %>

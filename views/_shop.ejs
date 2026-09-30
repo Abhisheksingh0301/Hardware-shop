@@ -1,0 +1,12 @@
+<%# Shop letterhead (from .env) for printed documents %>
+<div>
+  <h1><%= shop.name %></h1>
+  <% if (shop.tagline) { %><div class="muted"><%= shop.tagline %></div><% } %>
+  <% if (shop.address) { %><div><%= shop.address %></div><% } %>
+  <div>
+    <% if (shop.phone) { %>Ph: <%= shop.phone %><% } %>
+    <% if (shop.phone && shop.email) { %> · <% } %>
+    <% if (shop.email) { %><%= shop.email %><% } %>
+  </div>
+  <% if (shop.gstin) { %><div>GSTIN: <%= shop.gstin %></div><% } %>
+</div>

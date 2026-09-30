@@ -1,0 +1,48 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1>Daily Cash / UPI Register</h1>
+  <div class="actions no-print">
+    <form class="filters" method="get" style="margin:0">
+      <input type="date" name="date" value="<%= date %>">
+      <button class="btn">Show</button>
+      <button type="button" class="btn" onclick="window.print()">Print</button>
+    </form>
+  </div>
+</div>
+
+<p class="muted">Date: <strong><%= date %></strong> · <%= sales.n %> sales invoices worth <%= money(sales.total) %></p>
+
+<div class="stats">
+  <% Object.keys(byMode).forEach(function (m) { var v = byMode[m]; %>
+    <div class="stat">
+      <div class="label"><%= m %></div>
+      <div class="value <%= v.in - v.out < 0 ? 'neg' : '' %>"><%= money(v.in - v.out) %></div>
+      <small class="muted">In <%= money(v.in) %> · Out <%= money(v.out) %></small>
+    </div>
+  <% }) %>
+</div>
+
+<div class="card">
+  <% if (!rows.length) { %><p class="muted">No money movement on this day.</p><% } else {
+       var tin = 0, tout = 0; %>
+  <div class="table-wrap"><table>
+    <tr><th>Particulars</th><th>Mode</th><th>Reference</th><th class="num">In</th><th class="num">Out</th></tr>
+    <% rows.forEach(function (r) { if (r.dir === 'in') tin += r.amount; else tout += r.amount; %>
+      <tr>
+        <td><% if (r.id) { %><a href="/accounts/payments/<%= r.id %>"><%= r.text %></a><% } else { %><%= r.text %><% } %></td>
+        <td><%= r.mode %></td>
+        <td><%= r.reference %></td>
+        <td class="num pos"><%= r.dir === 'in' ? money(r.amount) : '' %></td>
+        <td class="num neg"><%= r.dir === 'out' ? money(r.amount) : '' %></td>
+      </tr>
+    <% }) %>
+    <tfoot>
+      <tr><td colspan="3">Total</td><td class="num"><%= money(tin) %></td><td class="num"><%= money(tout) %></td></tr>
+      <tr><td colspan="3">Net for the day</td><td class="num" colspan="2"><%= money(tin - tout) %></td></tr>
+    </tfoot>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

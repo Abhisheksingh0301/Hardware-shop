@@ -1,0 +1,110 @@
+<%- include('_header') %>
+
+<% var balance = inv.total - inv.paid; %>
+
+<div class="page-head no-print">
+  <h1>Invoice <%= inv.invoice_no %></h1>
+  <div class="actions">
+    <button class="btn primary" onclick="window.print()">Print</button>
+    <a class="btn" href="/invoices/new">+ New Sale</a>
+    <form class="inline" method="post" action="/invoices/<%= inv.id %>/delete" data-confirm="Cancel this invoice? Stock will be returned and its payments removed.">
+      <button class="btn danger">Cancel invoice</button>
+    </form>
+  </div>
+</div>
+
+<div class="card doc">
+  <div class="doc-head">
+    <%- include('_shop') %>
+    <div class="right">
+      <h1>TAX INVOICE</h1>
+      <div>No. <strong><%= inv.invoice_no %></strong></div>
+      <div>Date: <%= inv.invoice_date %></div>
+    </div>
+  </div>
+
+  <p>
+    <strong>Bill to:</strong>
+    <% if (inv.customer_id) { %>
+      <%= inv.cust_name %><% if (inv.phone) { %> · <%= inv.phone %><% } %>
+      <% if (inv.address) { %><br><%= inv.address %><% } %>
+      <% if (inv.gstin) { %><br>GSTIN: <%= inv.gstin %><% } %>
+    <% } else { %>
+      <%= inv.customer_name || 'Walk-in customer' %>
+    <% } %>
+  </p>
+
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>Item</th><th class="num">Qty</th><th class="num">Rate</th><th class="num">Disc</th><th class="num">GST</th><th class="num">Amount</th></tr>
+    <% items.forEach(function (it, i) { %>
+      <tr>
+        <td><%= i + 1 %></td>
+        <td><%= it.name %><% if (it.brand || it.size) { %> <small class="muted"><%= [it.brand, it.size].filter(Boolean).join(' · ') %></small><% } %></td>
+        <td class="num"><%= qty(it.qty) %> <%= it.unit %></td>
+        <td class="num"><%= money(it.rate) %></td>
+        <td class="num"><%= it.disc_pct ? it.disc_pct + '%' : '' %></td>
+        <td class="num"><%= it.gst_rate %>%</td>
+        <td class="num"><%= money(it.amount) %></td>
+      </tr>
+    <% }) %>
+  </table></div>
+
+  <table class="totals">
+    <tr><td>Subtotal</td><td class="num"><%= money(inv.subtotal) %></td></tr>
+    <% if (inv.discount) { %><tr><td>Discount</td><td class="num">− <%= money(inv.discount) %></td></tr><% } %>
+    <tr><td>GST</td><td class="num"><%= money(inv.tax) %></td></tr>
+    <tr class="grand"><td>Total</td><td class="num"><%= money(inv.total) %></td></tr>
+    <tr><td>Paid</td><td class="num"><%= money(inv.paid) %></td></tr>
+    <tr><td><strong>Balance due</strong></td><td class="num <%= balance > 0.009 ? 'neg' : '' %>"><strong><%= money(balance) %></strong></td></tr>
+  </table>
+  <% if (inv.notes) { %><p class="muted">Note: <%= inv.notes %></p><% } %>
+  <% if (balance > 0.009 && (shop.upiId || shop.bankAccount)) { %>
+    <div style="margin-top:16px; display:flex; gap:16px; align-items:center">
+      <% if (qr) { %>
+        <img src="<%= qr %>" alt="UPI QR code" width="130" height="130">
+      <% } %>
+      <div>
+        <strong>Pay balance of <%= money(balance) %>:</strong>
+        <% if (shop.upiId) { %><div>UPI: <strong><%= shop.upiId %></strong><%= shop.upiName ? ' (' + shop.upiName + ')' : '' %></div><% } %>
+        <% if (qr) { %><div class="muted">Scan with any UPI app — amount is filled in</div><% } %>
+        <% if (shop.bankAccount) { %><div>Bank: <%= shop.bankName %> · A/c <%= shop.bankAccount %> · IFSC <%= shop.bankIfsc %></div><% } %>
+      </div>
+    </div>
+  <% } %>
+  <p class="muted" style="margin-top:30px"><%= shop.invoiceFooter %></p>
+</div>
+
+<div class="card no-print">
+  <h2>Payments</h2>
+  <% if (!payments.length) { %><p class="muted">No payment received yet.</p><% } else { %>
+  <table>
+    <tr><th>Date</th><th>Mode</th><th>Reference</th><th class="num">Amount</th><th></th></tr>
+    <% payments.forEach(function (p) { %>
+      <tr>
+        <td><%= p.pay_date %></td><td><%= p.mode %></td><td><%= p.reference %></td>
+        <td class="num"><%= money(p.amount) %></td>
+        <td class="nowrap">
+          <a class="btn small" href="/accounts/payments/<%= p.id %>">Receipt</a>
+          <form class="inline" method="post" action="/accounts/payments/<%= p.id %>/delete" data-confirm="Delete this payment?">
+            <input type="hidden" name="back" value="/invoices/<%= inv.id %>"><button class="btn small danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </table>
+  <% } %>
+
+  <% if (balance > 0.009) { %>
+    <form method="post" action="/accounts/payments" class="filters" style="margin-top:12px">
+      <input type="hidden" name="invoice_id" value="<%= inv.id %>">
+      <input type="hidden" name="back" value="/invoices/<%= inv.id %>">
+      <div><label>Amount</label><input type="number" step="0.01" min="0.01" name="amount" value="<%= balance.toFixed(2) %>"></div>
+      <div><label>Mode</label><select name="mode"><% PAY_MODES.forEach(function (m) { %><option><%= m %></option><% }) %></select></div>
+      <div><label>Date</label><input type="date" name="pay_date" value="<%= today() %>"></div>
+      <div><label>Reference</label><input name="reference"></div>
+      <button class="btn primary">Receive payment</button>
+    </form>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

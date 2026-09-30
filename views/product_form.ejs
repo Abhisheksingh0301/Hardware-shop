@@ -1,0 +1,67 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1><%= title %></h1></div>
+
+<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+
+<form class="card" method="post" action="/inventory/save">
+  <input type="hidden" name="id" value="<%= row.id || '' %>">
+  <div class="form-grid">
+    <div>
+      <label>Type *</label>
+      <select name="type" onchange="document.getElementById('category').setAttribute('list', 'cat-' + this.value)">
+        <% Object.keys(PRODUCT_TYPES).forEach(function (t) { %>
+          <option value="<%= t %>" <%= row.type === t ? 'selected' : '' %>><%= PRODUCT_TYPES[t] %><%= t === 'raw' ? ' (for grills)' : '' %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="wide"><label>Product name *</label><input name="name" value="<%= row.name || '' %>" required autofocus></div>
+    <div>
+      <label>Category</label>
+      <input id="category" name="category" list="cat-<%= row.type %>" value="<%= row.category || '' %>" placeholder="Pick or type">
+      <% Object.keys(CATEGORIES).forEach(function (t) { %>
+        <datalist id="cat-<%= t %>"><% CATEGORIES[t].forEach(function (c) { %><option value="<%= c %>"><% }) %></datalist>
+      <% }) %>
+    </div>
+    <div>
+      <label>Brand</label>
+      <select name="brand_id">
+        <option value="">-- none --</option>
+        <% brands.forEach(function (b) { %><option value="<%= b.id %>" <%= row.brand_id == b.id ? 'selected' : '' %>><%= b.name %></option><% }) %>
+      </select>
+    </div>
+    <div><label>Size / pack</label><input name="size" value="<%= row.size || '' %>" placeholder="e.g. 20 L, 4 inch, 12 mm"></div>
+    <div>
+      <label>Unit</label>
+      <select name="unit">
+        <% UNITS.forEach(function (u) { %><option <%= row.unit === u ? 'selected' : '' %>><%= u %></option><% }) %>
+      </select>
+    </div>
+    <div><label>Purchase price (₹, before GST)</label><input type="number" step="0.01" min="0" name="purchase_price" value="<%= row.purchase_price || 0 %>"></div>
+    <div><label>Selling price (₹, before GST)</label><input type="number" step="0.01" min="0" name="selling_price" value="<%= row.selling_price || 0 %>"></div>
+    <div>
+      <label>GST rate</label>
+      <select name="gst_rate">
+        <% [0, 5, 12, 18, 28].forEach(function (g) { %><option value="<%= g %>" <%= Number(row.gst_rate) === g ? 'selected' : '' %>><%= g %>%</option><% }) %>
+      </select>
+    </div>
+    <div><label>Minimum stock level</label><input type="number" step="any" min="0" name="min_stock" value="<%= row.min_stock || 0 %>"></div>
+    <% if (!row.id) { %>
+      <div><label>Opening stock</label><input type="number" step="any" min="0" name="opening_stock" value="0"></div>
+    <% } %>
+    <div>
+      <label>Usual supplier</label>
+      <select name="supplier_id">
+        <option value="">-- none --</option>
+        <% suppliers.forEach(function (s) { %><option value="<%= s.id %>" <%= row.supplier_id == s.id ? 'selected' : '' %>><%= s.name %></option><% }) %>
+      </select>
+    </div>
+  </div>
+  <% if (row.id) { %><p class="muted">To change stock, use a purchase, a sale, or the stock adjustment on the product page.</p><% } %>
+  <p>
+    <button class="btn primary">Save</button>
+    <a class="btn" href="<%= row.id ? '/inventory/' + row.id : '/inventory?type=' + row.type %>">Cancel</a>
+  </p>
+</form>
+
+<%- include('_footer') %>

@@ -1,0 +1,81 @@
+<%- include('_header') %>
+
+<%
+  // Where each kind of movement links to
+  function refLink(m) {
+    if (!m.ref_id) return '';
+    if (m.kind === 'sale') return '/invoices/' + m.ref_id;
+    if (m.kind === 'purchase') return '/purchases/' + m.ref_id;
+    if (m.kind === 'grill') return '/grill/' + m.ref_id;
+    return '';
+  }
+%>
+
+<% if (product) { %>
+  <div class="page-head">
+    <div>
+      <h1><%= product.name %></h1>
+      <div class="muted">
+        <span class="badge <%= product.type %>"><%= PRODUCT_TYPES[product.type] %></span>
+        <%= product.category %><% if (product.brand) { %> · <%= product.brand %><% } %><% if (product.size) { %> · <%= product.size %><% } %>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="btn" href="/inventory/<%= product.id %>/edit">Edit</a>
+      <form class="inline" method="post" action="/inventory/<%= product.id %>/delete" data-confirm="Remove this product from the lists? Its history is kept.">
+        <button class="btn danger">Remove</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="label">In stock</div><div class="value <%= product.stock <= product.min_stock ? 'neg' : '' %>"><%= qty(product.stock) %> <%= product.unit %></div></div>
+    <div class="stat"><div class="label">Minimum level</div><div class="value"><%= qty(product.min_stock) %></div></div>
+    <div class="stat"><div class="label">Purchase / Selling price</div><div class="value" style="font-size:16px"><%= money(product.purchase_price) %> / <%= money(product.selling_price) %></div></div>
+    <div class="stat"><div class="label">GST · Supplier</div><div class="value" style="font-size:16px"><%= product.gst_rate %>% · <%= product.supplier || '-' %></div></div>
+  </div>
+
+  <form class="card" method="post" action="/inventory/<%= product.id %>/adjust">
+    <h2>Stock adjustment</h2>
+    <div class="filters">
+      <div><label>Quantity (+ add / − remove)</label><input type="number" step="any" name="qty" required></div>
+      <div style="flex:1"><label>Reason</label><input name="note" placeholder="e.g. damaged, physical count correction" style="width:100%"></div>
+      <button class="btn primary">Save</button>
+    </div>
+  </form>
+<% } else { %>
+  <div class="page-head"><h1>Inventory Register</h1></div>
+  <form class="card filters" method="get">
+    <div><label>From</label><input type="date" name="from" value="<%= from %>"></div>
+    <div><label>To</label><input type="date" name="to" value="<%= to %>"></div>
+    <div>
+      <label>Type</label>
+      <select name="type">
+        <option value="">All</option>
+        <% Object.keys(PRODUCT_TYPES).forEach(function (t) { %><option value="<%= t %>" <%= type === t ? 'selected' : '' %>><%= PRODUCT_TYPES[t] %></option><% }) %>
+      </select>
+    </div>
+    <button class="btn">Show</button>
+  </form>
+<% } %>
+
+<div class="card">
+  <h2>Stock movements</h2>
+  <% if (!rows.length) { %><p class="muted">No stock movements.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr><th>Date / time</th><% if (!product) { %><th>Product</th><% } %><th>Type</th><th>Details</th><th class="num">In</th><th class="num">Out</th></tr>
+    <% rows.forEach(function (m) { var link = refLink(m); %>
+      <tr>
+        <td class="nowrap"><%= m.created_at %></td>
+        <% if (!product) { %><td><a href="/inventory/<%= m.product_id %>"><%= m.name %></a></td><% } %>
+        <td><span class="badge"><%= m.kind %></span></td>
+        <td><% if (link) { %><a href="<%= link %>"><%= m.note %></a><% } else { %><%= m.note %><% } %></td>
+        <td class="num pos"><%= m.qty > 0 ? qty(m.qty) + ' ' + m.unit : '' %></td>
+        <td class="num neg"><%= m.qty < 0 ? qty(-m.qty) + ' ' + m.unit : '' %></td>
+      </tr>
+    <% }) %>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

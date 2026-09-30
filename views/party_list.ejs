@@ -1,0 +1,37 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1><%= p.plural %></h1>
+  <div class="actions"><a class="btn primary" href="/<%= kind %>/new">+ New <%= p.label %></a></div>
+</div>
+
+<div class="card">
+  <form class="filters" method="get">
+    <input name="q" value="<%= q %>" placeholder="Search name or phone">
+    <button class="btn">Search</button>
+  </form>
+
+  <% if (!rows.length) { %><p class="muted">No <%= p.plural.toLowerCase() %> found.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr>
+      <th>Name</th><th>Phone</th>
+      <% if (kind === 'suppliers') { %><th>Contact person</th><th>Supplies</th><th>Credit</th><% } else { %><th>Address</th><% } %>
+      <th class="num"><%= kind === 'customers' ? 'Receivable' : 'Payable' %></th>
+    </tr>
+    <% rows.forEach(function (r) { %>
+      <tr>
+        <td><a href="/<%= kind %>/<%= r.id %>"><%= r.name %></a></td>
+        <td><%= r.phone %></td>
+        <% if (kind === 'suppliers') { %>
+          <td><%= r.contact_person %></td><td><%= r.products_supplied %></td><td><%= r.credit_days %> days</td>
+        <% } else { %>
+          <td><%= r.address %></td>
+        <% } %>
+        <td class="num <%= r.due > 0.009 ? 'neg' : '' %>"><%= money(r.due) %></td>
+      </tr>
+    <% }) %>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

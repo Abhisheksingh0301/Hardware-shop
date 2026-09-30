@@ -1,0 +1,51 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1><%= title %></h1>
+  <div class="actions">
+    <a class="btn primary" href="/inventory/new?type=<%= type %>">+ New <%= type ? PRODUCT_TYPES[type] : 'Product' %></a>
+    <a class="btn" href="/purchases/new">+ Purchase</a>
+  </div>
+</div>
+
+<div class="tabs">
+  <a href="/inventory" class="<%= !type ? 'active' : '' %>">All</a>
+  <% Object.keys(PRODUCT_TYPES).forEach(function (t) { %>
+    <a href="/inventory?type=<%= t %>" class="<%= type === t ? 'active' : '' %>"><%= PRODUCT_TYPES[t] %></a>
+  <% }) %>
+</div>
+
+<div class="card">
+  <form class="filters" method="get">
+    <input type="hidden" name="type" value="<%= type %>">
+    <input name="q" value="<%= q %>" placeholder="Search name, category, brand">
+    <label class="check"><input type="checkbox" name="low" value="1" <%= low ? 'checked' : '' %>> Low stock only</label>
+    <button class="btn">Filter</button>
+    <span class="muted" style="margin-left:auto">Stock value (at cost): <strong><%= money(value) %></strong></span>
+  </form>
+
+  <% if (!rows.length) { %><p class="muted">No products found.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr>
+      <th>Product</th><% if (!type) { %><th>Type</th><% } %><th>Category</th><th>Brand</th><th>Size</th>
+      <th class="num">Buy</th><th class="num">Sell</th><th class="num">GST</th><th class="num">Stock</th><th class="num">Min</th>
+    </tr>
+    <% rows.forEach(function (p) { var isLow = p.stock <= p.min_stock; %>
+      <tr class="<%= isLow ? 'low' : '' %>">
+        <td><a href="/inventory/<%= p.id %>"><%= p.name %></a></td>
+        <% if (!type) { %><td><span class="badge <%= p.type %>"><%= PRODUCT_TYPES[p.type] %></span></td><% } %>
+        <td><%= p.category %></td>
+        <td><%= p.brand || '' %></td>
+        <td><%= p.size %></td>
+        <td class="num"><%= money(p.purchase_price) %></td>
+        <td class="num"><%= money(p.selling_price) %></td>
+        <td class="num"><%= p.gst_rate %>%</td>
+        <td class="num <%= isLow ? 'neg' : '' %>"><strong><%= qty(p.stock) %></strong> <%= p.unit %></td>
+        <td class="num"><%= qty(p.min_stock) %></td>
+      </tr>
+    <% }) %>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

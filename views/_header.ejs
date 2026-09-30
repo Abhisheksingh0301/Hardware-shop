@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | <%= shop.name %></title>
+  <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar no-print">
+    <div class="brand">
+      <strong><%= shop.name %></strong>
+      <small><%= shop.tagline %></small>
+    </div>
+    <%
+      var menu = [
+        ['', [['/', 'Dashboard']]],
+        ['Shop Sales', [['/invoices/new', 'New Sale'], ['/invoices', 'Sales Invoices'], ['/purchases', 'Purchases']]],
+        ['Inventory', [['/inventory?type=paint', 'Paint'], ['/inventory?type=hardware', 'Hardware'],
+                       ['/inventory?type=raw', 'Raw Material'], ['/inventory/register', 'Inventory Register'], ['/brands', 'Paint Brands']]],
+        ['Grill Manufacturing', [['/grill/new', 'New Grill Order'], ['/grill', 'Grill Jobs']]],
+        ['Accounts', [['/accounts/payments', 'Payments'], ['/accounts/expenses', 'Expenses'],
+                      ['/accounts/daybook', 'Cash / UPI Register'], ['/accounts/reports', 'Reports']]],
+        ['Masters', [['/customers', 'Customers'], ['/suppliers', 'Suppliers']]]
+      ];
+    %>
+    <nav>
+      <% menu.forEach(function (group) { %>
+        <% if (group[0]) { %><div class="nav-group"><%= group[0] %></div><% } %>
+        <% group[1].forEach(function (item) {
+             var parts = item[0].split('?type=');
+             var base = parts[0], active;
+             if (parts[1]) active = path === base && query.type === parts[1];
+             else if (base === '/') active = path === '/';
+             else active = path === base || (path.indexOf(base + '/') === 0 && path !== '/invoices/new' && path !== '/grill/new');
+        %>
+          <a href="<%= item[0] %>" class="<%= active ? 'active' : '' %>"><%= item[1] %></a>
+        <% }) %>
+      <% }) %>
+    </nav>
+  </aside>
+
+  <main>
+    <% if (msg) { %><div class="alert ok no-print"><%= msg %></div><% } %>
+    <% if (err) { %><div class="alert bad no-print"><%= err %></div><% } %>

@@ -1,0 +1,10 @@
+<%- include('_header') %>
+
+<div class="card">
+  <h1><%= message %></h1>
+  <% if (error.status) { %><h2 class="muted"><%= error.status %></h2><% } %>
+  <% if (error.stack) { %><pre style="white-space:pre-wrap"><%= error.stack %></pre><% } %>
+  <p><a class="btn" href="/">Back to dashboard</a></p>
+</div>
+
+<%- include('_footer') %>

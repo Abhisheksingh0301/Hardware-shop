@@ -1,0 +1,87 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1>New Sale</h1><a class="btn" href="/invoices">All invoices</a></div>
+
+<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+
+<form method="post" action="/invoices">
+  <div class="card">
+    <div class="form-grid">
+      <div>
+        <label>Customer</label>
+        <select name="customer_id">
+          <option value="">Walk-in customer</option>
+          <% customers.forEach(function (c) { %>
+            <option value="<%= c.id %>" <%= data.customer_id == c.id ? 'selected' : '' %>><%= c.name %><%= c.phone ? ' - ' + c.phone : '' %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div><label>Walk-in name (optional)</label><input name="customer_name" value="<%= data.customer_name || '' %>"></div>
+      <div><label>Date</label><input type="date" name="invoice_date" value="<%= data.invoice_date %>"></div>
+    </div>
+  </div>
+
+  <div class="card lines-box" data-mode="sale" data-items="<%= JSON.stringify(data.lines) %>">
+    <h2>Items</h2>
+    <div class="table-wrap">
+      <table class="lines">
+        <thead><tr><th>Product</th><th class="w-qty">Qty</th><th class="w-rate">Rate ₹</th><th class="w-pct">Disc %</th><th class="w-pct">GST %</th><th class="num">Amount</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <template>
+      <tr>
+        <td>
+          <select name="product_id">
+            <option value="">-- select item --</option>
+            <% ['paint', 'hardware'].forEach(function (t) { %>
+              <optgroup label="<%= t === 'paint' ? 'Paint' : 'Hardware' %>">
+                <% products.filter(function (p) { return p.type === t; }).forEach(function (p) { %>
+                  <option value="<%= p.id %>" data-sell="<%= p.selling_price %>" data-buy="<%= p.purchase_price %>" data-gst="<%= p.gst_rate %>"
+                    data-unit="<%= p.unit %>" data-stock="<%= p.stock %>"><%= p.name %><%= p.brand ? ' · ' + p.brand : '' %><%= p.size ? ' · ' + p.size : '' %></option>
+                <% }) %>
+              </optgroup>
+            <% }) %>
+          </select>
+          <small class="info muted"></small>
+        </td>
+        <td><input class="w-qty" type="number" step="any" min="0" name="qty"></td>
+        <td><input class="w-rate" type="number" step="0.01" min="0" name="rate"></td>
+        <td><input class="w-pct" type="number" step="0.01" min="0" max="100" name="disc" value="0"></td>
+        <td><input class="w-pct" type="number" step="0.01" min="0" name="gst" value="0"></td>
+        <td class="num amt"></td>
+        <td><button type="button" class="btn small remove" title="Remove">✕</button></td>
+      </tr>
+    </template>
+
+    <table class="totals">
+      <tr><td>Subtotal</td><td class="num" data-sum="subtotal"></td></tr>
+      <tr><td>Discount</td><td class="num" data-sum="discount"></td></tr>
+      <tr><td>GST</td><td class="num" data-sum="tax"></td></tr>
+      <tr class="grand"><td>Total</td><td class="num" data-sum="total"></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Payment</h2>
+    <div class="form-grid">
+      <div>
+        <label>Amount received (₹)</label>
+        <div style="display:flex; gap:6px">
+          <input type="number" step="0.01" min="0" name="paid" value="<%= data.paid || 0 %>">
+          <button type="button" class="btn" data-fill-paid>Full</button>
+        </div>
+        <small class="muted">Less than the total = credit sale (customer required)</small>
+      </div>
+      <div>
+        <label>Mode</label>
+        <select name="mode"><% PAY_MODES.forEach(function (m) { %><option <%= data.mode === m ? 'selected' : '' %>><%= m %></option><% }) %></select>
+      </div>
+      <div><label>Reference / UTR</label><input name="reference" value="<%= data.reference || '' %>"></div>
+      <div><label>Notes</label><input name="notes" value="<%= data.notes || '' %>"></div>
+    </div>
+    <p><button class="btn primary">Save invoice</button></p>
+  </div>
+</form>
+
+<%- include('_footer') %>

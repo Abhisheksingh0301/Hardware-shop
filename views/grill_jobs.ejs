@@ -1,0 +1,46 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1>Grill Jobs</h1>
+  <a class="btn primary" href="/grill/new">+ New Grill Order</a>
+</div>
+
+<div class="tabs">
+  <a href="/grill?status=open" class="<%= status === 'open' ? 'active' : '' %>">Open</a>
+  <a href="/grill?status=Completed" class="<%= status === 'Completed' ? 'active' : '' %>">Completed</a>
+  <a href="/grill?status=Cancelled" class="<%= status === 'Cancelled' ? 'active' : '' %>">Cancelled</a>
+  <a href="/grill?status=all" class="<%= status === 'all' ? 'active' : '' %>">All</a>
+</div>
+
+<div class="card">
+  <form class="filters" method="get">
+    <select name="status">
+      <option value="open" <%= status === 'open' ? 'selected' : '' %>>All open</option>
+      <option value="all" <%= status === 'all' ? 'selected' : '' %>>Everything</option>
+      <% GRILL_STATUSES.forEach(function (s) { %><option <%= status === s ? 'selected' : '' %>><%= s %></option><% }) %>
+    </select>
+    <input name="q" value="<%= q %>" placeholder="Job no., customer or phone">
+    <button class="btn">Filter</button>
+  </form>
+
+  <% if (!rows.length) { %><p class="muted">No grill jobs found.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr><th>Job no.</th><th>Customer</th><th>Grill</th><th>Size (W × H)</th><th>Status</th><th>Due date</th><th class="num">Price</th><th class="num">Received</th><th class="num">Balance</th></tr>
+    <% rows.forEach(function (g) { var bal = g.agreed_price - g.paid; %>
+      <tr>
+        <td><a href="/grill/<%= g.id %>"><strong><%= g.job_no %></strong></a></td>
+        <td><a href="/customers/<%= g.customer_id %>"><%= g.customer %></a><br><small class="muted"><%= g.phone %></small></td>
+        <td><%= g.grill_type %> × <%= g.quantity %></td>
+        <td><%= g.width || '?' %> × <%= g.height || '?' %></td>
+        <td><span class="badge <%= g.status === 'Completed' ? 'good' : g.status === 'Cancelled' ? 'danger' : 'warn' %>"><%= g.status %></span></td>
+        <td class="nowrap <%= g.expected_date && g.expected_date < today() && g.status !== 'Completed' ? 'neg' : '' %>"><%= g.expected_date || '-' %></td>
+        <td class="num"><%= money(g.agreed_price) %></td>
+        <td class="num"><%= money(g.paid) %></td>
+        <td class="num <%= bal > 0.009 ? 'neg' : '' %>"><%= money(bal) %></td>
+      </tr>
+    <% }) %>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

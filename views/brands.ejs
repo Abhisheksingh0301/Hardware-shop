@@ -1,0 +1,54 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1>Paint Brands</h1></div>
+
+<form class="card" method="post" action="/brands/save">
+  <h2><%= edit.id ? 'Edit brand' : 'Add brand' %></h2>
+  <input type="hidden" name="id" value="<%= edit.id || '' %>">
+  <div class="form-grid">
+    <div><label>Brand name *</label><input name="name" value="<%= edit.name || '' %>" required></div>
+    <div>
+      <label>Distributor / supplier</label>
+      <select name="supplier_id">
+        <option value="">-- none --</option>
+        <% suppliers.forEach(function (s) { %>
+          <option value="<%= s.id %>" <%= edit.supplier_id == s.id ? 'selected' : '' %>><%= s.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div><label>Dealer discount (%)</label><input type="number" step="0.01" name="dealer_discount" value="<%= edit.dealer_discount || 0 %>"></div>
+    <div><label>Credit terms</label><input name="credit_terms" value="<%= edit.credit_terms || '' %>" placeholder="e.g. 30 days"></div>
+    <div><label>Payment terms</label><input name="payment_terms" value="<%= edit.payment_terms || '' %>" placeholder="e.g. 2% cash discount within 7 days"></div>
+    <div><label>Notes</label><input name="notes" value="<%= edit.notes || '' %>"></div>
+  </div>
+  <p>
+    <button class="btn primary">Save brand</button>
+    <% if (edit.id) { %><a class="btn" href="/brands">Cancel</a><% } %>
+  </p>
+</form>
+
+<div class="card">
+  <% if (!rows.length) { %><p class="muted">No brands yet.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr><th>Brand</th><th>Distributor</th><th class="num">Dealer disc.</th><th>Credit terms</th><th>Payment terms</th><th class="num">Products</th><th></th></tr>
+    <% rows.forEach(function (b) { %>
+      <tr>
+        <td><strong><%= b.name %></strong><% if (b.notes) { %><br><small class="muted"><%= b.notes %></small><% } %></td>
+        <td><% if (b.supplier_id) { %><a href="/suppliers/<%= b.supplier_id %>"><%= b.supplier %></a><br><small class="muted"><%= b.supplier_phone %></small><% } %></td>
+        <td class="num"><%= b.dealer_discount %>%</td>
+        <td><%= b.credit_terms %></td>
+        <td><%= b.payment_terms %></td>
+        <td class="num"><a href="/inventory?type=paint&q=<%= encodeURIComponent(b.name) %>"><%= b.products %></a></td>
+        <td class="nowrap">
+          <a class="btn small" href="/brands?edit=<%= b.id %>">Edit</a>
+          <form class="inline" method="post" action="/brands/<%= b.id %>/delete" data-confirm="Delete brand <%= b.name %>?">
+            <button class="btn small danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

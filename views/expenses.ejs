@@ -1,0 +1,42 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1>Expenses</h1></div>
+
+<form class="card" method="post" action="/accounts/expenses">
+  <h2>Add expense</h2>
+  <div class="form-grid">
+    <div><label>Date</label><input type="date" name="exp_date" value="<%= today() %>"></div>
+    <div>
+      <label>Category</label>
+      <input name="category" list="exp-cats" required placeholder="Pick or type">
+      <datalist id="exp-cats"><% EXPENSE_CATEGORIES.forEach(function (c) { %><option value="<%= c %>"><% }) %></datalist>
+    </div>
+    <div><label>Amount (₹)</label><input type="number" step="0.01" min="0.01" name="amount" required></div>
+    <div><label>Mode</label><select name="mode"><% PAY_MODES.forEach(function (m) { %><option><%= m %></option><% }) %></select></div>
+    <div class="wide"><label>Note</label><input name="note"></div>
+  </div>
+  <p><button class="btn primary">Save expense</button></p>
+</form>
+
+<div class="card">
+  <form class="filters" method="get">
+    <div><label>From</label><input type="date" name="from" value="<%= from %>"></div>
+    <div><label>To</label><input type="date" name="to" value="<%= to %>"></div>
+    <button class="btn">Show</button>
+  </form>
+  <% if (!rows.length) { %><p class="muted">No expenses in this period.</p><% } else { %>
+  <div class="table-wrap"><table>
+    <tr><th>Date</th><th>Category</th><th>Note</th><th>Mode</th><th class="num">Amount</th><th></th></tr>
+    <% rows.forEach(function (e) { %>
+      <tr>
+        <td><%= e.exp_date %></td><td><%= e.category %></td><td><%= e.note %></td><td><%= e.mode %></td>
+        <td class="num"><%= money(e.amount) %></td>
+        <td><form class="inline" method="post" action="/accounts/expenses/<%= e.id %>/delete" data-confirm="Delete this expense?"><button class="btn small danger">✕</button></form></td>
+      </tr>
+    <% }) %>
+    <tfoot><tr><td colspan="4">Total</td><td class="num"><%= money(total) %></td><td></td></tr></tfoot>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>

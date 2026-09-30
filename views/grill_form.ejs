@@ -1,0 +1,72 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1><%= title %></h1></div>
+
+<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+<% if (!customers.length) { %><div class="alert bad">Add the customer first: <a href="/customers/new">New customer</a></div><% } %>
+
+<form method="post" action="/grill/save">
+  <input type="hidden" name="id" value="<%= row.id || '' %>">
+
+  <div class="card">
+    <h2>Customer &amp; site</h2>
+    <div class="form-grid">
+      <div>
+        <label>Customer *</label>
+        <select name="customer_id" required data-fill="#site_address">
+          <option value="">-- select customer --</option>
+          <% customers.forEach(function (c) { %>
+            <option value="<%= c.id %>" data-fill-value="<%= c.address || '' %>" <%= row.customer_id == c.id ? 'selected' : '' %>><%= c.name %><%= c.phone ? ' - ' + c.phone : '' %></option>
+          <% }) %>
+        </select>
+        <small><a href="/customers/new" target="_blank">+ new customer</a></small>
+      </div>
+      <div class="wide"><label>Site / installation address</label><textarea id="site_address" name="site_address"><%= row.site_address || '' %></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Grill &amp; measurements</h2>
+    <div class="form-grid">
+      <div>
+        <label>Grill type</label>
+        <input name="grill_type" list="grill-types" value="<%= row.grill_type || '' %>">
+        <datalist id="grill-types"><% GRILL_TYPES.forEach(function (t) { %><option value="<%= t %>"><% }) %></datalist>
+      </div>
+      <div><label>Quantity (no. of grills)</label><input type="number" min="1" name="quantity" value="<%= row.quantity || 1 %>"></div>
+      <div><label>Width</label><input name="width" value="<%= row.width || '' %>" placeholder="e.g. 4 ft 6 in"></div>
+      <div><label>Height</label><input name="height" value="<%= row.height || '' %>" placeholder="e.g. 5 ft"></div>
+      <div><label>Frame dimensions</label><input name="frame_size" value="<%= row.frame_size || '' %>" placeholder="e.g. 1&quot; angle"></div>
+      <div><label>Rod size</label><input name="rod_size" value="<%= row.rod_size || '' %>" placeholder="e.g. 12 mm square"></div>
+      <div><label>Spacing between rods</label><input name="spacing" value="<%= row.spacing || '' %>" placeholder="e.g. 4 in"></div>
+      <div class="wide"><label>Other measurements</label><textarea name="other_measurements"><%= row.other_measurements || '' %></textarea></div>
+      <div class="wide"><label>Design</label><textarea name="design" placeholder="Describe the design or sketch reference"><%= row.design || '' %></textarea></div>
+      <div><label>Material specification</label><input name="material_spec" value="<%= row.material_spec || '' %>" placeholder="e.g. MS flat 25×5 + 12 mm rod"></div>
+      <div><label>Finish / paint</label><input name="finish" value="<%= row.finish || '' %>" placeholder="e.g. Red oxide primer + black enamel"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Delivery &amp; price</h2>
+    <div class="form-grid">
+      <div>
+        <label class="check"><input type="checkbox" name="delivery_required" value="1" <%= row.delivery_required ? 'checked' : '' %>> Delivery required</label>
+        <label class="check"><input type="checkbox" name="installation_required" value="1" <%= row.installation_required ? 'checked' : '' %>> Installation required</label>
+      </div>
+      <div><label>Expected delivery date</label><input type="date" name="expected_date" value="<%= row.expected_date || '' %>"></div>
+      <div><label>Agreed price (₹)</label><input type="number" step="0.01" min="0" name="agreed_price" value="<%= row.agreed_price || 0 %>"></div>
+      <% if (!row.id) { %>
+        <div><label>Advance received (₹)</label><input type="number" step="0.01" min="0" name="advance" value="<%= row.advance || 0 %>"></div>
+        <div><label>Advance mode</label><select name="mode"><% PAY_MODES.forEach(function (m) { %><option <%= row.mode === m ? 'selected' : '' %>><%= m %></option><% }) %></select></div>
+        <div><label>Reference</label><input name="reference"></div>
+      <% } %>
+      <div class="wide"><label>Notes</label><textarea name="notes"><%= row.notes || '' %></textarea></div>
+    </div>
+    <p>
+      <button class="btn primary"><%= row.id ? 'Save changes' : 'Create order' %></button>
+      <a class="btn" href="<%= row.id ? '/grill/' + row.id : '/grill' %>">Cancel</a>
+    </p>
+  </div>
+</form>
+
+<%- include('_footer') %>

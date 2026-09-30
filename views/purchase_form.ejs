@@ -1,0 +1,83 @@
+<%- include('_header') %>
+
+<div class="page-head"><h1>New Purchase</h1><a class="btn" href="/purchases">All purchases</a></div>
+
+<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+<% if (!suppliers.length) { %><div class="alert bad">Add a supplier first: <a href="/suppliers/new">New supplier</a></div><% } %>
+
+<form method="post" action="/purchases">
+  <div class="card">
+    <div class="form-grid">
+      <div>
+        <label>Supplier *</label>
+        <select name="supplier_id" required>
+          <option value="">-- select supplier --</option>
+          <% suppliers.forEach(function (s) { %><option value="<%= s.id %>" <%= data.supplier_id == s.id ? 'selected' : '' %>><%= s.name %></option><% }) %>
+        </select>
+      </div>
+      <div><label>Supplier bill / invoice no.</label><input name="invoice_no" value="<%= data.invoice_no || '' %>"></div>
+      <div><label>Purchase date</label><input type="date" name="purchase_date" value="<%= data.purchase_date %>"></div>
+    </div>
+  </div>
+
+  <div class="card lines-box" data-mode="purchase" data-items="<%= JSON.stringify(data.lines) %>">
+    <h2>Items received</h2>
+    <p class="muted">Paint and hardware go into saleable stock; raw material goes into grill manufacturing stock.
+      Missing an item? <a href="/inventory/new" target="_blank">Add product</a> and reload.</p>
+    <div class="table-wrap">
+      <table class="lines">
+        <thead><tr><th>Product</th><th class="w-qty">Qty</th><th class="w-rate">Rate ₹</th><th class="w-pct">GST %</th><th class="num">Amount</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <template>
+      <tr>
+        <td>
+          <select name="product_id">
+            <option value="">-- select item --</option>
+            <% [['paint', 'Paint'], ['hardware', 'Hardware'], ['raw', 'Raw Material (grill)']].forEach(function (t) { %>
+              <optgroup label="<%= t[1] %>">
+                <% products.filter(function (p) { return p.type === t[0]; }).forEach(function (p) { %>
+                  <option value="<%= p.id %>" data-sell="<%= p.selling_price %>" data-buy="<%= p.purchase_price %>" data-gst="<%= p.gst_rate %>"
+                    data-unit="<%= p.unit %>" data-stock="<%= p.stock %>"><%= p.name %><%= p.brand ? ' · ' + p.brand : '' %><%= p.size ? ' · ' + p.size : '' %></option>
+                <% }) %>
+              </optgroup>
+            <% }) %>
+          </select>
+          <small class="info muted"></small>
+        </td>
+        <td><input class="w-qty" type="number" step="any" min="0" name="qty"></td>
+        <td><input class="w-rate" type="number" step="0.01" min="0" name="rate"></td>
+        <td><input class="w-pct" type="number" step="0.01" min="0" name="gst" value="0"></td>
+        <td class="num amt"></td>
+        <td><button type="button" class="btn small remove" title="Remove">✕</button></td>
+      </tr>
+    </template>
+
+    <table class="totals">
+      <tr><td>Subtotal</td><td class="num" data-sum="subtotal"></td></tr>
+      <tr><td>GST</td><td class="num" data-sum="tax"></td></tr>
+      <tr class="grand"><td>Total</td><td class="num" data-sum="total"></td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Payment to supplier</h2>
+    <div class="form-grid">
+      <div>
+        <label>Amount paid now (₹)</label>
+        <div style="display:flex; gap:6px">
+          <input type="number" step="0.01" min="0" name="paid" value="<%= data.paid || 0 %>">
+          <button type="button" class="btn" data-fill-paid>Full</button>
+        </div>
+        <small class="muted">Leave 0 for a credit purchase</small>
+      </div>
+      <div><label>Mode</label><select name="mode"><% PAY_MODES.forEach(function (m) { %><option <%= data.mode === m ? 'selected' : '' %>><%= m %></option><% }) %></select></div>
+      <div><label>Reference</label><input name="reference" value="<%= data.reference || '' %>"></div>
+      <div><label>Notes</label><input name="notes" value="<%= data.notes || '' %>"></div>
+    </div>
+    <p><button class="btn primary">Save purchase</button></p>
+  </div>
+</form>
+
+<%- include('_footer') %>

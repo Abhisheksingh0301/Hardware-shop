@@ -1,0 +1,36 @@
+<%- include('_header') %>
+
+<div class="page-head">
+  <h1>Sales Invoices</h1>
+  <a class="btn primary" href="/invoices/new">+ New Sale</a>
+</div>
+
+<div class="card">
+  <form class="filters" method="get">
+    <div><label>From</label><input type="date" name="from" value="<%= from %>"></div>
+    <div><label>To</label><input type="date" name="to" value="<%= to %>"></div>
+    <div><label>Search</label><input name="q" value="<%= q %>" placeholder="Invoice no. or customer"></div>
+    <button class="btn">Show</button>
+  </form>
+
+  <% if (!rows.length) { %><p class="muted">No invoices in this period.</p><% } else {
+       var sum = { total: 0, paid: 0 }; %>
+  <div class="table-wrap"><table>
+    <tr><th>Invoice</th><th>Date</th><th>Customer</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th><th></th></tr>
+    <% rows.forEach(function (r) { var bal = r.total - r.paid; sum.total += r.total; sum.paid += r.paid; %>
+      <tr>
+        <td><a href="/invoices/<%= r.id %>"><%= r.invoice_no %></a></td>
+        <td><%= r.invoice_date %></td>
+        <td><% if (r.customer_id) { %><a href="/customers/<%= r.customer_id %>"><%= r.customer %></a><% } else { %><%= r.customer %><% } %></td>
+        <td class="num"><%= money(r.total) %></td>
+        <td class="num"><%= money(r.paid) %></td>
+        <td class="num <%= bal > 0.009 ? 'neg' : '' %>"><%= money(bal) %></td>
+        <td><span class="badge <%= bal > 0.009 ? (r.paid > 0 ? 'warn' : 'danger') : 'good' %>"><%= bal > 0.009 ? (r.paid > 0 ? 'Part paid' : 'Unpaid') : 'Paid' %></span></td>
+      </tr>
+    <% }) %>
+    <tfoot><tr><td colspan="3"><%= rows.length %> invoices</td><td class="num"><%= money(sum.total) %></td><td class="num"><%= money(sum.paid) %></td><td class="num"><%= money(sum.total - sum.paid) %></td><td></td></tr></tfoot>
+  </table></div>
+  <% } %>
+</div>
+
+<%- include('_footer') %>
