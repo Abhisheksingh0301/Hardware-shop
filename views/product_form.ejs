@@ -1,12 +1,12 @@
 <%- include('_header') %>
 
-<div class="page-head"><h1><%= title %></h1></div>
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h1><%= title %></h1></div>
 
-<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+<% if (error) { %><div class="alert alert-bad"><%= error %></div><% } %>
 
 <form class="card" method="post" action="/inventory/save">
   <input type="hidden" name="id" value="<%= row.id || '' %>">
-  <div class="form-grid">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4 gap-y-3">
     <div>
       <label>Type *</label>
       <select name="type" onchange="document.getElementById('category').setAttribute('list', 'cat-' + this.value)">
@@ -15,7 +15,7 @@
         <% }) %>
       </select>
     </div>
-    <div class="wide"><label>Product name *</label><input name="name" value="<%= row.name || '' %>" required autofocus></div>
+    <div class="col-span-full"><label>Product name *</label><input name="name" value="<%= row.name || '' %>" required autofocus></div>
     <div>
       <label>Category</label>
       <input id="category" name="category" list="cat-<%= row.type %>" value="<%= row.category || '' %>" placeholder="Pick or type">
@@ -57,9 +57,9 @@
       </select>
     </div>
   </div>
-  <% if (row.id) { %><p class="muted">To change stock, use a purchase, a sale, or the stock adjustment on the product page.</p><% } %>
+  <% if (row.id) { %><p class="text-gray-500">To change stock, use a purchase, a sale, or the stock adjustment on the product page.</p><% } %>
   <p>
-    <button class="btn primary">Save</button>
+    <button class="btn btn-primary">Save</button>
     <a class="btn" href="<%= row.id ? '/inventory/' + row.id : '/inventory?type=' + row.type %>">Cancel</a>
   </p>
 </form>

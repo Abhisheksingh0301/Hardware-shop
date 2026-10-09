@@ -1,22 +1,22 @@
 <%- include('_header') %>
 
-<div class="page-head">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1><%= p.plural %></h1>
-  <div class="actions"><a class="btn primary" href="/<%= kind %>/new">+ New <%= p.label %></a></div>
+  <div class="flex flex-wrap gap-2"><a class="btn btn-primary" href="/<%= kind %>/new">+ New <%= p.label %></a></div>
 </div>
 
 <div class="card">
-  <form class="filters" method="get">
+  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
     <input name="q" value="<%= q %>" placeholder="Search name or phone">
     <button class="btn">Search</button>
   </form>
 
-  <% if (!rows.length) { %><p class="muted">No <%= p.plural.toLowerCase() %> found.</p><% } else { %>
-  <div class="table-wrap"><table>
+  <% if (!rows.length) { %><p class="text-gray-500">No <%= p.plural.toLowerCase() %> found.</p><% } else { %>
+  <div class="overflow-x-auto"><table>
     <tr>
       <th>Name</th><th>Phone</th>
       <% if (kind === 'suppliers') { %><th>Contact person</th><th>Supplies</th><th>Credit</th><% } else { %><th>Address</th><% } %>
-      <th class="num"><%= kind === 'customers' ? 'Receivable' : 'Payable' %></th>
+      <th class="text-right whitespace-nowrap"><%= kind === 'customers' ? 'Receivable' : 'Payable' %></th>
     </tr>
     <% rows.forEach(function (r) { %>
       <tr>
@@ -27,7 +27,7 @@
         <% } else { %>
           <td><%= r.address %></td>
         <% } %>
-        <td class="num <%= r.due > 0.009 ? 'neg' : '' %>"><%= money(r.due) %></td>
+        <td class="text-right whitespace-nowrap <%= r.due > 0.009 ? 'text-red-700' : '' %>"><%= money(r.due) %></td>
       </tr>
     <% }) %>
   </table></div>

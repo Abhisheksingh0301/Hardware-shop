@@ -1,9 +1,9 @@
 <%- include('_header') %>
 
-<div class="page-head">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1>Daily Cash / UPI Register</h1>
-  <div class="actions no-print">
-    <form class="filters" method="get" style="margin:0">
+  <div class="flex flex-wrap gap-2 print:hidden">
+    <form class="m-0 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
       <input type="date" name="date" value="<%= date %>">
       <button class="btn">Show</button>
       <button type="button" class="btn" onclick="window.print()">Print</button>
@@ -11,35 +11,35 @@
   </div>
 </div>
 
-<p class="muted">Date: <strong><%= date %></strong> · <%= sales.n %> sales invoices worth <%= money(sales.total) %></p>
+<p class="text-gray-500">Date: <strong><%= date %></strong> · <%= sales.n %> sales invoices worth <%= money(sales.total) %></p>
 
-<div class="stats">
+<div class="mb-4 grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3">
   <% Object.keys(byMode).forEach(function (m) { var v = byMode[m]; %>
-    <div class="stat">
-      <div class="label"><%= m %></div>
-      <div class="value <%= v.in - v.out < 0 ? 'neg' : '' %>"><%= money(v.in - v.out) %></div>
-      <small class="muted">In <%= money(v.in) %> · Out <%= money(v.out) %></small>
+    <div class="rounded-[10px] border border-gray-200 bg-white p-3.5">
+      <div class="text-xs text-gray-500"><%= m %></div>
+      <div class="mt-0.5 text-xl font-semibold <%= v.in - v.out < 0 ? 'text-red-700' : '' %>"><%= money(v.in - v.out) %></div>
+      <small class="text-gray-500">In <%= money(v.in) %> · Out <%= money(v.out) %></small>
     </div>
   <% }) %>
 </div>
 
 <div class="card">
-  <% if (!rows.length) { %><p class="muted">No money movement on this day.</p><% } else {
+  <% if (!rows.length) { %><p class="text-gray-500">No money movement on this day.</p><% } else {
        var tin = 0, tout = 0; %>
-  <div class="table-wrap"><table>
-    <tr><th>Particulars</th><th>Mode</th><th>Reference</th><th class="num">In</th><th class="num">Out</th></tr>
+  <div class="overflow-x-auto"><table>
+    <tr><th>Particulars</th><th>Mode</th><th>Reference</th><th class="text-right whitespace-nowrap">In</th><th class="text-right whitespace-nowrap">Out</th></tr>
     <% rows.forEach(function (r) { if (r.dir === 'in') tin += r.amount; else tout += r.amount; %>
       <tr>
         <td><% if (r.id) { %><a href="/accounts/payments/<%= r.id %>"><%= r.text %></a><% } else { %><%= r.text %><% } %></td>
         <td><%= r.mode %></td>
         <td><%= r.reference %></td>
-        <td class="num pos"><%= r.dir === 'in' ? money(r.amount) : '' %></td>
-        <td class="num neg"><%= r.dir === 'out' ? money(r.amount) : '' %></td>
+        <td class="text-right whitespace-nowrap text-green-700"><%= r.dir === 'in' ? money(r.amount) : '' %></td>
+        <td class="text-right whitespace-nowrap text-red-700"><%= r.dir === 'out' ? money(r.amount) : '' %></td>
       </tr>
     <% }) %>
     <tfoot>
-      <tr><td colspan="3">Total</td><td class="num"><%= money(tin) %></td><td class="num"><%= money(tout) %></td></tr>
-      <tr><td colspan="3">Net for the day</td><td class="num" colspan="2"><%= money(tin - tout) %></td></tr>
+      <tr><td colspan="3">Total</td><td class="text-right whitespace-nowrap"><%= money(tin) %></td><td class="text-right whitespace-nowrap"><%= money(tout) %></td></tr>
+      <tr><td colspan="3">Net for the day</td><td class="text-right whitespace-nowrap" colspan="2"><%= money(tin - tout) %></td></tr>
     </tfoot>
   </table></div>
   <% } %>

@@ -1,3 +1,5 @@
 node_modules/
 #.env
 hwshop.db
+# Built by Tailwind (npm run build:css)
+public/stylesheets/style.css

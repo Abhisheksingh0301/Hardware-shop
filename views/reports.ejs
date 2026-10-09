@@ -1,8 +1,8 @@
 <%- include('_header') %>
 
-<div class="page-head">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1>Reports</h1>
-  <form class="filters no-print" method="get" style="margin:0">
+  <form class="m-0 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px] print:hidden" method="get">
     <div><label>From</label><input type="date" name="from" value="<%= from %>"></div>
     <div><label>To</label><input type="date" name="to" value="<%= to %>"></div>
     <button class="btn">Show</button>
@@ -10,76 +10,76 @@
   </form>
 </div>
 
-<div class="stats">
-  <div class="stat"><div class="label">Shop sales (excl. GST)</div><div class="value"><%= money(shop.revenue) %></div></div>
-  <div class="stat"><div class="label">Grill orders booked</div><div class="value"><%= money(grill.revenue) %></div><small class="muted"><%= grill.jobs %> jobs</small></div>
-  <div class="stat"><div class="label">Expenses</div><div class="value"><%= money(expenseTotal) %></div></div>
-  <div class="stat"><div class="label">Net profit</div><div class="value <%= netProfit < 0 ? 'neg' : 'pos' %>"><%= money(netProfit) %></div></div>
+<div class="mb-4 grid grid-cols-[repeat(auto-fit,minmax(170px,1fr))] gap-3">
+  <div class="rounded-[10px] border border-gray-200 bg-white p-3.5"><div class="text-xs text-gray-500">Shop sales (excl. GST)</div><div class="mt-0.5 text-xl font-semibold"><%= money(shop.revenue) %></div></div>
+  <div class="rounded-[10px] border border-gray-200 bg-white p-3.5"><div class="text-xs text-gray-500">Grill orders booked</div><div class="mt-0.5 text-xl font-semibold"><%= money(grill.revenue) %></div><small class="text-gray-500"><%= grill.jobs %> jobs</small></div>
+  <div class="rounded-[10px] border border-gray-200 bg-white p-3.5"><div class="text-xs text-gray-500">Expenses</div><div class="mt-0.5 text-xl font-semibold"><%= money(expenseTotal) %></div></div>
+  <div class="rounded-[10px] border border-gray-200 bg-white p-3.5"><div class="text-xs text-gray-500">Net profit</div><div class="mt-0.5 text-xl font-semibold <%= netProfit < 0 ? 'text-red-700' : 'text-green-700' %>"><%= money(netProfit) %></div></div>
 </div>
 
-<div class="grid two">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-4 ">
   <div class="card">
     <h2>Profit &amp; Loss · <%= from %> to <%= to %></h2>
     <table>
-      <tr><th>Shop sales</th><th class="num">Revenue</th><th class="num">Cost</th><th class="num">Margin</th></tr>
+      <tr><th>Shop sales</th><th class="text-right whitespace-nowrap">Revenue</th><th class="text-right whitespace-nowrap">Cost</th><th class="text-right whitespace-nowrap">Margin</th></tr>
       <% byType.forEach(function (t) { %>
-        <tr><td style="text-transform:capitalize"><%= t.type %></td><td class="num"><%= money(t.revenue) %></td><td class="num"><%= money(t.cost) %></td><td class="num"><%= money(t.revenue - t.cost) %></td></tr>
+        <tr><td class="capitalize"><%= t.type %></td><td class="text-right whitespace-nowrap"><%= money(t.revenue) %></td><td class="text-right whitespace-nowrap"><%= money(t.cost) %></td><td class="text-right whitespace-nowrap"><%= money(t.revenue - t.cost) %></td></tr>
       <% }) %>
-      <tr><td><strong>Shop total</strong></td><td class="num"><%= money(shop.revenue) %></td><td class="num"><%= money(shop.cost) %></td><td class="num"><strong><%= money(shop.revenue - shop.cost) %></strong></td></tr>
-      <tr><td><strong>Grill manufacturing</strong><br><small class="muted">jobs booked in period; cost = material issued</small></td>
-        <td class="num"><%= money(grill.revenue) %></td><td class="num"><%= money(grill.cost) %></td><td class="num"><strong><%= money(grill.revenue - grill.cost) %></strong></td></tr>
-      <tr><td colspan="3"><strong>Gross profit</strong></td><td class="num"><strong><%= money(grossProfit) %></strong></td></tr>
+      <tr><td><strong>Shop total</strong></td><td class="text-right whitespace-nowrap"><%= money(shop.revenue) %></td><td class="text-right whitespace-nowrap"><%= money(shop.cost) %></td><td class="text-right whitespace-nowrap"><strong><%= money(shop.revenue - shop.cost) %></strong></td></tr>
+      <tr><td><strong>Grill manufacturing</strong><br><small class="text-gray-500">jobs booked in period; cost = material issued</small></td>
+        <td class="text-right whitespace-nowrap"><%= money(grill.revenue) %></td><td class="text-right whitespace-nowrap"><%= money(grill.cost) %></td><td class="text-right whitespace-nowrap"><strong><%= money(grill.revenue - grill.cost) %></strong></td></tr>
+      <tr><td colspan="3"><strong>Gross profit</strong></td><td class="text-right whitespace-nowrap"><strong><%= money(grossProfit) %></strong></td></tr>
       <% expenses.forEach(function (e) { %>
-        <tr><td colspan="3" class="muted">Less: <%= e.category %></td><td class="num neg">− <%= money(e.amount) %></td></tr>
+        <tr><td colspan="3" class="text-gray-500">Less: <%= e.category %></td><td class="text-right whitespace-nowrap text-red-700">− <%= money(e.amount) %></td></tr>
       <% }) %>
-      <tfoot><tr><td colspan="3">Net profit</td><td class="num <%= netProfit < 0 ? 'neg' : 'pos' %>"><%= money(netProfit) %></td></tr></tfoot>
+      <tfoot><tr><td colspan="3">Net profit</td><td class="text-right whitespace-nowrap <%= netProfit < 0 ? 'text-red-700' : 'text-green-700' %>"><%= money(netProfit) %></td></tr></tfoot>
     </table>
   </div>
 
   <div>
     <div class="card">
       <h2>GST summary</h2>
-      <table class="plain">
-        <tr><td>GST collected on sales</td><td class="num"><%= money(gst.collected) %></td></tr>
-        <tr><td>GST paid on purchases</td><td class="num"><%= money(gst.paid) %></td></tr>
-        <tr><td><strong>Net GST payable</strong></td><td class="num"><strong><%= money(gst.collected - gst.paid) %></strong></td></tr>
+      <table class="[&_td]:border-0 [&_td]:py-0.75 [&_td]:pr-2 [&_td]:pl-0">
+        <tr><td>GST collected on sales</td><td class="text-right whitespace-nowrap"><%= money(gst.collected) %></td></tr>
+        <tr><td>GST paid on purchases</td><td class="text-right whitespace-nowrap"><%= money(gst.paid) %></td></tr>
+        <tr><td><strong>Net GST payable</strong></td><td class="text-right whitespace-nowrap"><strong><%= money(gst.collected - gst.paid) %></strong></td></tr>
       </table>
     </div>
     <div class="card">
       <h2>Cash / UPI / Bank movement</h2>
-      <% if (!cash.length) { %><p class="muted">No payments in this period.</p><% } else { %>
+      <% if (!cash.length) { %><p class="text-gray-500">No payments in this period.</p><% } else { %>
       <table>
-        <tr><th>Mode</th><th class="num">Received</th><th class="num">Paid</th></tr>
-        <% cash.forEach(function (c) { %><tr><td><%= c.mode %></td><td class="num"><%= money(c.received) %></td><td class="num"><%= money(c.paid) %></td></tr><% }) %>
+        <tr><th>Mode</th><th class="text-right whitespace-nowrap">Received</th><th class="text-right whitespace-nowrap">Paid</th></tr>
+        <% cash.forEach(function (c) { %><tr><td><%= c.mode %></td><td class="text-right whitespace-nowrap"><%= money(c.received) %></td><td class="text-right whitespace-nowrap"><%= money(c.paid) %></td></tr><% }) %>
       </table>
-      <p class="muted">Expenses are listed separately in the P&amp;L.</p>
+      <p class="text-gray-500">Expenses are listed separately in the P&amp;L.</p>
       <% } %>
     </div>
   </div>
 </div>
 
-<div class="grid two">
+<div class="grid grid-cols-[repeat(auto-fit,minmax(340px,1fr))] gap-4 ">
   <div class="card" id="receivables">
     <h2>Customer outstanding (receivables)</h2>
-    <% if (!receivables.length) { %><p class="muted">No customer owes money.</p><% } else { var tr = 0; %>
+    <% if (!receivables.length) { %><p class="text-gray-500">No customer owes money.</p><% } else { var tr = 0; %>
     <table>
-      <tr><th>Customer</th><th>Phone</th><th class="num">Due</th></tr>
+      <tr><th>Customer</th><th>Phone</th><th class="text-right whitespace-nowrap">Due</th></tr>
       <% receivables.forEach(function (r) { tr += r.due; %>
-        <tr><td><a href="/customers/<%= r.id %>"><%= r.name %></a></td><td><%= r.phone %></td><td class="num neg"><%= money(r.due) %></td></tr>
+        <tr><td><a href="/customers/<%= r.id %>"><%= r.name %></a></td><td><%= r.phone %></td><td class="text-right whitespace-nowrap text-red-700"><%= money(r.due) %></td></tr>
       <% }) %>
-      <tfoot><tr><td colspan="2">Total</td><td class="num"><%= money(tr) %></td></tr></tfoot>
+      <tfoot><tr><td colspan="2">Total</td><td class="text-right whitespace-nowrap"><%= money(tr) %></td></tr></tfoot>
     </table>
     <% } %>
   </div>
   <div class="card" id="payables">
     <h2>Supplier outstanding (payables)</h2>
-    <% if (!payables.length) { %><p class="muted">Nothing owed to suppliers.</p><% } else { var tp = 0; %>
+    <% if (!payables.length) { %><p class="text-gray-500">Nothing owed to suppliers.</p><% } else { var tp = 0; %>
     <table>
-      <tr><th>Supplier</th><th>Credit</th><th class="num">Due</th></tr>
+      <tr><th>Supplier</th><th>Credit</th><th class="text-right whitespace-nowrap">Due</th></tr>
       <% payables.forEach(function (s) { tp += s.due; %>
-        <tr><td><a href="/suppliers/<%= s.id %>"><%= s.name %></a></td><td><%= s.credit_days %> days</td><td class="num neg"><%= money(s.due) %></td></tr>
+        <tr><td><a href="/suppliers/<%= s.id %>"><%= s.name %></a></td><td><%= s.credit_days %> days</td><td class="text-right whitespace-nowrap text-red-700"><%= money(s.due) %></td></tr>
       <% }) %>
-      <tfoot><tr><td colspan="2">Total</td><td class="num"><%= money(tp) %></td></tr></tfoot>
+      <tfoot><tr><td colspan="2">Total</td><td class="text-right whitespace-nowrap"><%= money(tp) %></td></tr></tfoot>
     </table>
     <% } %>
   </div>

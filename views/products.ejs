@@ -1,47 +1,47 @@
 <%- include('_header') %>
 
-<div class="page-head">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1><%= title %></h1>
-  <div class="actions">
-    <a class="btn primary" href="/inventory/new?type=<%= type %>">+ New <%= type ? PRODUCT_TYPES[type] : 'Product' %></a>
+  <div class="flex flex-wrap gap-2">
+    <a class="btn btn-primary" href="/inventory/new?type=<%= type %>">+ New <%= type ? PRODUCT_TYPES[type] : 'Product' %></a>
     <a class="btn" href="/purchases/new">+ Purchase</a>
   </div>
 </div>
 
-<div class="tabs">
-  <a href="/inventory" class="<%= !type ? 'active' : '' %>">All</a>
+<div class="mb-3 flex flex-wrap gap-1.5 *:rounded-full *:border *:border-gray-200 *:bg-white *:px-3 *:py-1.25 *:text-gray-800 *:hover:no-underline *:aria-[current=page]:border-orange-700 *:aria-[current=page]:bg-orange-700 *:aria-[current=page]:text-white">
+  <a href="/inventory" <%- !type ? 'aria-current="page"' : '' %>>All</a>
   <% Object.keys(PRODUCT_TYPES).forEach(function (t) { %>
-    <a href="/inventory?type=<%= t %>" class="<%= type === t ? 'active' : '' %>"><%= PRODUCT_TYPES[t] %></a>
+    <a href="/inventory?type=<%= t %>" <%- type === t ? 'aria-current="page"' : '' %>><%= PRODUCT_TYPES[t] %></a>
   <% }) %>
 </div>
 
 <div class="card">
-  <form class="filters" method="get">
+  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
     <input type="hidden" name="type" value="<%= type %>">
     <input name="q" value="<%= q %>" placeholder="Search name, category, brand">
-    <label class="check"><input type="checkbox" name="low" value="1" <%= low ? 'checked' : '' %>> Low stock only</label>
+    <label class="flex items-center gap-1.5 text-sm font-normal"><input type="checkbox" name="low" value="1" <%= low ? 'checked' : '' %>> Low stock only</label>
     <button class="btn">Filter</button>
-    <span class="muted" style="margin-left:auto">Stock value (at cost): <strong><%= money(value) %></strong></span>
+    <span class="ml-auto text-gray-500">Stock value (at cost): <strong><%= money(value) %></strong></span>
   </form>
 
-  <% if (!rows.length) { %><p class="muted">No products found.</p><% } else { %>
-  <div class="table-wrap"><table>
+  <% if (!rows.length) { %><p class="text-gray-500">No products found.</p><% } else { %>
+  <div class="overflow-x-auto"><table>
     <tr>
       <th>Product</th><% if (!type) { %><th>Type</th><% } %><th>Category</th><th>Brand</th><th>Size</th>
-      <th class="num">Buy</th><th class="num">Sell</th><th class="num">GST</th><th class="num">Stock</th><th class="num">Min</th>
+      <th class="text-right whitespace-nowrap">Buy</th><th class="text-right whitespace-nowrap">Sell</th><th class="text-right whitespace-nowrap">GST</th><th class="text-right whitespace-nowrap">Stock</th><th class="text-right whitespace-nowrap">Min</th>
     </tr>
     <% rows.forEach(function (p) { var isLow = p.stock <= p.min_stock; %>
-      <tr class="<%= isLow ? 'low' : '' %>">
+      <tr class="<%= isLow ? 'bg-orange-50' : '' %>">
         <td><a href="/inventory/<%= p.id %>"><%= p.name %></a></td>
-        <% if (!type) { %><td><span class="badge <%= p.type %>"><%= PRODUCT_TYPES[p.type] %></span></td><% } %>
+        <% if (!type) { %><td><span class="badge badge-<%= p.type %>"><%= PRODUCT_TYPES[p.type] %></span></td><% } %>
         <td><%= p.category %></td>
         <td><%= p.brand || '' %></td>
         <td><%= p.size %></td>
-        <td class="num"><%= money(p.purchase_price) %></td>
-        <td class="num"><%= money(p.selling_price) %></td>
-        <td class="num"><%= p.gst_rate %>%</td>
-        <td class="num <%= isLow ? 'neg' : '' %>"><strong><%= qty(p.stock) %></strong> <%= p.unit %></td>
-        <td class="num"><%= qty(p.min_stock) %></td>
+        <td class="text-right whitespace-nowrap"><%= money(p.purchase_price) %></td>
+        <td class="text-right whitespace-nowrap"><%= money(p.selling_price) %></td>
+        <td class="text-right whitespace-nowrap"><%= p.gst_rate %>%</td>
+        <td class="text-right whitespace-nowrap <%= isLow ? 'text-red-700' : '' %>"><strong><%= qty(p.stock) %></strong> <%= p.unit %></td>
+        <td class="text-right whitespace-nowrap"><%= qty(p.min_stock) %></td>
       </tr>
     <% }) %>
   </table></div>

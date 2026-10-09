@@ -3,6 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
+    "build:css": "tailwindcss -i ./src/app.css -o ./public/stylesheets/style.css --minify",
+    "watch:css": "tailwindcss -i ./src/app.css -o ./public/stylesheets/style.css --watch",
+    "prestart": "npm run build:css",
     "start": "node ./bin/www"
   },
   "dependencies": {
@@ -15,5 +18,9 @@
     "morgan": "~1.9.1",
     "qrcode": "^1.5.4",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "tailwindcss": "^4.3.3"
   }
 }

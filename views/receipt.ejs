@@ -1,29 +1,29 @@
 <%- include('_header') %>
 
-<div class="page-head no-print">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3 print:hidden">
   <h1><%= title %></h1>
-  <button class="btn primary" onclick="window.print()">Print</button>
+  <button class="btn btn-primary" onclick="window.print()">Print</button>
 </div>
 
-<div class="card doc" style="max-width:560px">
-  <div class="doc-head">
+<div class="card max-w-[560px]">
+  <div class="mb-3 flex justify-between gap-4 border-b-2 border-gray-800 pb-2.5 [&_h1]:text-xl">
     <%- include('_shop') %>
-    <div class="right">
+    <div class="text-right">
       <h1><%= pay.direction === 'in' ? 'RECEIPT' : 'PAYMENT VOUCHER' %></h1>
       <div>No. <%= (pay.direction === 'in' ? 'RC-' : 'PV-') + pay.id %></div>
       <div>Date: <%= pay.pay_date %></div>
     </div>
   </div>
 
-  <table class="plain">
+  <table class="[&_td]:border-0 [&_td]:py-0.75 [&_td]:pr-2 [&_td]:pl-0">
     <tr>
-      <td class="muted"><%= pay.direction === 'in' ? 'Received from' : 'Paid to' %></td>
+      <td class="text-gray-500"><%= pay.direction === 'in' ? 'Received from' : 'Paid to' %></td>
       <td><strong><%= pay.customer || pay.supplier || 'Walk-in customer' %></strong> <%= pay.c_phone || pay.s_phone || '' %></td>
     </tr>
-    <tr><td class="muted">Amount</td><td><strong style="font-size:18px"><%= money(pay.amount) %></strong></td></tr>
-    <tr><td class="muted">Mode</td><td><%= pay.mode %><%= pay.reference ? ' · Ref ' + pay.reference : '' %></td></tr>
+    <tr><td class="text-gray-500">Amount</td><td><strong class="text-lg"><%= money(pay.amount) %></strong></td></tr>
+    <tr><td class="text-gray-500">Mode</td><td><%= pay.mode %><%= pay.reference ? ' · Ref ' + pay.reference : '' %></td></tr>
     <tr>
-      <td class="muted">Against</td>
+      <td class="text-gray-500">Against</td>
       <td>
         <% if (pay.invoice_no) { %>Invoice <%= pay.invoice_no %>
         <% } else if (pay.job_no) { %>Grill job <%= pay.job_no %>
@@ -31,10 +31,10 @@
         <% } else { %>On account<% } %>
       </td>
     </tr>
-    <% if (pay.note) { %><tr><td class="muted">Note</td><td><%= pay.note %></td></tr><% } %>
+    <% if (pay.note) { %><tr><td class="text-gray-500">Note</td><td><%= pay.note %></td></tr><% } %>
   </table>
 
-  <p style="margin-top:50px" class="right">Signature</p>
+  <p class="mt-12.5 text-right">Signature</p>
 </div>
 
 <%- include('_footer') %>

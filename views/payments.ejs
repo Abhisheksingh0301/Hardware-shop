@@ -1,11 +1,11 @@
 <%- include('_header') %>
 
-<div class="page-head"><h1>Payments</h1></div>
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h1>Payments</h1></div>
 
 <form class="card" method="post" action="/accounts/payments">
   <h2>Record a payment (on account)</h2>
-  <p class="muted">To pay against a specific invoice, grill job or purchase, open that document instead.</p>
-  <div class="form-grid">
+  <p class="text-gray-500">To pay against a specific invoice, grill job or purchase, open that document instead.</p>
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4 gap-y-3">
     <div>
       <label>Type</label>
       <select name="direction" data-direction>
@@ -33,11 +33,11 @@
     <div><label>Reference / UTR / cheque no.</label><input name="reference"></div>
     <div><label>Note</label><input name="note"></div>
   </div>
-  <p><button class="btn primary">Save payment</button></p>
+  <p><button class="btn btn-primary">Save payment</button></p>
 </form>
 
 <div class="card">
-  <form class="filters" method="get">
+  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
     <div><label>From</label><input type="date" name="from" value="<%= from %>"></div>
     <div><label>To</label><input type="date" name="to" value="<%= to %>"></div>
     <div>
@@ -51,13 +51,13 @@
     <button class="btn">Show</button>
   </form>
 
-  <% if (!rows.length) { %><p class="muted">No payments in this period.</p><% } else {
+  <% if (!rows.length) { %><p class="text-gray-500">No payments in this period.</p><% } else {
        var tin = 0, tout = 0; %>
-  <div class="table-wrap"><table>
-    <tr><th>Date</th><th>Party</th><th>Against</th><th>Mode</th><th>Reference</th><th class="num">Received</th><th class="num">Paid</th><th></th></tr>
+  <div class="overflow-x-auto"><table>
+    <tr><th>Date</th><th>Party</th><th>Against</th><th>Mode</th><th>Reference</th><th class="text-right whitespace-nowrap">Received</th><th class="text-right whitespace-nowrap">Paid</th><th></th></tr>
     <% rows.forEach(function (p) { if (p.direction === 'in') tin += p.amount; else tout += p.amount; %>
       <tr>
-        <td class="nowrap"><%= p.pay_date %></td>
+        <td class="whitespace-nowrap"><%= p.pay_date %></td>
         <td>
           <% if (p.customer_id) { %><a href="/customers/<%= p.customer_id %>"><%= p.customer %></a>
           <% } else if (p.supplier_id) { %><a href="/suppliers/<%= p.supplier_id %>"><%= p.supplier %></a>
@@ -67,21 +67,21 @@
           <% if (p.invoice_id) { %><a href="/invoices/<%= p.invoice_id %>"><%= p.invoice_no %></a>
           <% } else if (p.job_id) { %><a href="/grill/<%= p.job_id %>"><%= p.job_no %></a>
           <% } else if (p.purchase_id) { %><a href="/purchases/<%= p.purchase_id %>">Purchase <%= p.purchase_no || '#' + p.purchase_id %></a>
-          <% } else { %><span class="muted">On account</span><% } %>
+          <% } else { %><span class="text-gray-500">On account</span><% } %>
         </td>
         <td><%= p.mode %></td>
         <td><%= p.reference %></td>
-        <td class="num pos"><%= p.direction === 'in' ? money(p.amount) : '' %></td>
-        <td class="num neg"><%= p.direction === 'out' ? money(p.amount) : '' %></td>
-        <td class="nowrap">
-          <a class="btn small" href="/accounts/payments/<%= p.id %>"><%= p.direction === 'in' ? 'Receipt' : 'Voucher' %></a>
+        <td class="text-right whitespace-nowrap text-green-700"><%= p.direction === 'in' ? money(p.amount) : '' %></td>
+        <td class="text-right whitespace-nowrap text-red-700"><%= p.direction === 'out' ? money(p.amount) : '' %></td>
+        <td class="whitespace-nowrap">
+          <a class="btn btn-sm" href="/accounts/payments/<%= p.id %>"><%= p.direction === 'in' ? 'Receipt' : 'Voucher' %></a>
           <form class="inline" method="post" action="/accounts/payments/<%= p.id %>/delete" data-confirm="Delete this payment?">
-            <button class="btn small danger">✕</button>
+            <button class="btn btn-sm btn-danger">✕</button>
           </form>
         </td>
       </tr>
     <% }) %>
-    <tfoot><tr><td colspan="5">Total</td><td class="num"><%= money(tin) %></td><td class="num"><%= money(tout) %></td><td></td></tr></tfoot>
+    <tfoot><tr><td colspan="5">Total</td><td class="text-right whitespace-nowrap"><%= money(tin) %></td><td class="text-right whitespace-nowrap"><%= money(tout) %></td><td></td></tr></tfoot>
   </table></div>
   <% } %>
 </div>

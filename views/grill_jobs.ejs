@@ -1,19 +1,19 @@
 <%- include('_header') %>
 
-<div class="page-head">
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
   <h1>Grill Jobs</h1>
-  <a class="btn primary" href="/grill/new">+ New Grill Order</a>
+  <a class="btn btn-primary" href="/grill/new">+ New Grill Order</a>
 </div>
 
-<div class="tabs">
-  <a href="/grill?status=open" class="<%= status === 'open' ? 'active' : '' %>">Open</a>
-  <a href="/grill?status=Completed" class="<%= status === 'Completed' ? 'active' : '' %>">Completed</a>
-  <a href="/grill?status=Cancelled" class="<%= status === 'Cancelled' ? 'active' : '' %>">Cancelled</a>
-  <a href="/grill?status=all" class="<%= status === 'all' ? 'active' : '' %>">All</a>
+<div class="mb-3 flex flex-wrap gap-1.5 *:rounded-full *:border *:border-gray-200 *:bg-white *:px-3 *:py-1.25 *:text-gray-800 *:hover:no-underline *:aria-[current=page]:border-orange-700 *:aria-[current=page]:bg-orange-700 *:aria-[current=page]:text-white">
+  <a href="/grill?status=open" <%- status === 'open' ? 'aria-current="page"' : '' %>>Open</a>
+  <a href="/grill?status=Completed" <%- status === 'Completed' ? 'aria-current="page"' : '' %>>Completed</a>
+  <a href="/grill?status=Cancelled" <%- status === 'Cancelled' ? 'aria-current="page"' : '' %>>Cancelled</a>
+  <a href="/grill?status=all" <%- status === 'all' ? 'aria-current="page"' : '' %>>All</a>
 </div>
 
 <div class="card">
-  <form class="filters" method="get">
+  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
     <select name="status">
       <option value="open" <%= status === 'open' ? 'selected' : '' %>>All open</option>
       <option value="all" <%= status === 'all' ? 'selected' : '' %>>Everything</option>
@@ -23,20 +23,20 @@
     <button class="btn">Filter</button>
   </form>
 
-  <% if (!rows.length) { %><p class="muted">No grill jobs found.</p><% } else { %>
-  <div class="table-wrap"><table>
-    <tr><th>Job no.</th><th>Customer</th><th>Grill</th><th>Size (W × H)</th><th>Status</th><th>Due date</th><th class="num">Price</th><th class="num">Received</th><th class="num">Balance</th></tr>
+  <% if (!rows.length) { %><p class="text-gray-500">No grill jobs found.</p><% } else { %>
+  <div class="overflow-x-auto"><table>
+    <tr><th>Job no.</th><th>Customer</th><th>Grill</th><th>Size (W × H)</th><th>Status</th><th>Due date</th><th class="text-right whitespace-nowrap">Price</th><th class="text-right whitespace-nowrap">Received</th><th class="text-right whitespace-nowrap">Balance</th></tr>
     <% rows.forEach(function (g) { var bal = g.agreed_price - g.paid; %>
       <tr>
         <td><a href="/grill/<%= g.id %>"><strong><%= g.job_no %></strong></a></td>
-        <td><a href="/customers/<%= g.customer_id %>"><%= g.customer %></a><br><small class="muted"><%= g.phone %></small></td>
+        <td><a href="/customers/<%= g.customer_id %>"><%= g.customer %></a><br><small class="text-gray-500"><%= g.phone %></small></td>
         <td><%= g.grill_type %> × <%= g.quantity %></td>
         <td><%= g.width || '?' %> × <%= g.height || '?' %></td>
-        <td><span class="badge <%= g.status === 'Completed' ? 'good' : g.status === 'Cancelled' ? 'danger' : 'warn' %>"><%= g.status %></span></td>
-        <td class="nowrap <%= g.expected_date && g.expected_date < today() && g.status !== 'Completed' ? 'neg' : '' %>"><%= g.expected_date || '-' %></td>
-        <td class="num"><%= money(g.agreed_price) %></td>
-        <td class="num"><%= money(g.paid) %></td>
-        <td class="num <%= bal > 0.009 ? 'neg' : '' %>"><%= money(bal) %></td>
+        <td><span class="badge <%= g.status === 'Completed' ? 'badge-good' : g.status === 'Cancelled' ? 'badge-danger' : 'badge-warn' %>"><%= g.status %></span></td>
+        <td class="whitespace-nowrap <%= g.expected_date && g.expected_date < today() && g.status !== 'Completed' ? 'text-red-700' : '' %>"><%= g.expected_date || '-' %></td>
+        <td class="text-right whitespace-nowrap"><%= money(g.agreed_price) %></td>
+        <td class="text-right whitespace-nowrap"><%= money(g.paid) %></td>
+        <td class="text-right whitespace-nowrap <%= bal > 0.009 ? 'text-red-700' : '' %>"><%= money(bal) %></td>
       </tr>
     <% }) %>
   </table></div>

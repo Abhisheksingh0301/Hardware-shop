@@ -1,7 +1,7 @@
 <%# Shop letterhead (from .env) for printed documents %>
 <div>
   <h1><%= shop.name %></h1>
-  <% if (shop.tagline) { %><div class="muted"><%= shop.tagline %></div><% } %>
+  <% if (shop.tagline) { %><div class="text-gray-500"><%= shop.tagline %></div><% } %>
   <% if (shop.address) { %><div><%= shop.address %></div><% } %>
   <div>
     <% if (shop.phone) { %>Ph: <%= shop.phone %><% } %>

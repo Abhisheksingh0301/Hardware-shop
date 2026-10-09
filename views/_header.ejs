@@ -7,11 +7,11 @@
   <link rel="stylesheet" href="/stylesheets/style.css">
 </head>
 <body>
-<div class="layout">
-  <aside class="sidebar no-print">
-    <div class="brand">
-      <strong><%= shop.name %></strong>
-      <small><%= shop.tagline %></small>
+<div class="flex min-h-screen max-[800px]:flex-col print:block">
+  <aside class="w-[215px] shrink-0 bg-slate-800 text-slate-300 max-[800px]:w-full print:hidden">
+    <div class="border-b border-slate-700 px-4.5 pt-4.5 pb-3.5">
+      <strong class="block text-[17px] text-white"><%= shop.name %></strong>
+      <small class="text-slate-400"><%= shop.tagline %></small>
     </div>
     <%
       var menu = [
@@ -25,9 +25,9 @@
         ['Masters', [['/customers', 'Customers'], ['/suppliers', 'Suppliers']]]
       ];
     %>
-    <nav>
+    <nav class="px-2.5 pt-2 pb-5 max-[800px]:flex max-[800px]:flex-wrap max-[800px]:gap-0.5">
       <% menu.forEach(function (group) { %>
-        <% if (group[0]) { %><div class="nav-group"><%= group[0] %></div><% } %>
+        <% if (group[0]) { %><div class="mx-2 mt-3.5 mb-1 text-[11px] tracking-[.06em] text-slate-500 uppercase max-[800px]:mt-2 max-[800px]:mb-0.5 max-[800px]:w-full"><%= group[0] %></div><% } %>
         <% group[1].forEach(function (item) {
              var parts = item[0].split('?type=');
              var base = parts[0], active;
@@ -35,12 +35,12 @@
              else if (base === '/') active = path === '/';
              else active = path === base || (path.indexOf(base + '/') === 0 && path !== '/invoices/new' && path !== '/grill/new');
         %>
-          <a href="<%= item[0] %>" class="<%= active ? 'active' : '' %>"><%= item[1] %></a>
+          <a href="<%= item[0] %>" class="block rounded-md px-2.5 py-1.5 text-slate-300 hover:bg-slate-700 hover:text-white hover:no-underline aria-[current=page]:bg-orange-700 aria-[current=page]:text-white"<%- active ? ' aria-current="page"' : '' %>><%= item[1] %></a>
         <% }) %>
       <% }) %>
     </nav>
   </aside>
 
-  <main>
-    <% if (msg) { %><div class="alert ok no-print"><%= msg %></div><% } %>
-    <% if (err) { %><div class="alert bad no-print"><%= err %></div><% } %>
+  <main class="min-w-0 flex-1 px-6.5 py-5.5 max-[800px]:p-4 print:p-0">
+    <% if (msg) { %><div class="alert alert-ok print:hidden"><%= msg %></div><% } %>
+    <% if (err) { %><div class="alert alert-bad print:hidden"><%= err %></div><% } %>

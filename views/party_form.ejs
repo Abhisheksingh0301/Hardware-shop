@@ -1,31 +1,31 @@
 <%- include('_header') %>
 
-<div class="page-head"><h1><%= title %></h1></div>
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h1><%= title %></h1></div>
 
-<% if (error) { %><div class="alert bad"><%= error %></div><% } %>
+<% if (error) { %><div class="alert alert-bad"><%= error %></div><% } %>
 
 <form class="card" method="post" action="/<%= kind %>/save">
   <input type="hidden" name="id" value="<%= row.id || '' %>">
-  <div class="form-grid">
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-x-4 gap-y-3">
     <div><label>Name *</label><input name="name" value="<%= row.name || '' %>" required autofocus></div>
     <% if (kind === 'suppliers') { %>
       <div><label>Contact person</label><input name="contact_person" value="<%= row.contact_person || '' %>"></div>
     <% } %>
     <div><label>Mobile number</label><input name="phone" value="<%= row.phone || '' %>"></div>
     <div><label>GSTIN</label><input name="gstin" value="<%= row.gstin || '' %>"></div>
-    <div class="wide"><label>Address</label><textarea name="address"><%= row.address || '' %></textarea></div>
+    <div class="col-span-full"><label>Address</label><textarea name="address"><%= row.address || '' %></textarea></div>
     <% if (kind === 'suppliers') { %>
-      <div class="wide"><label>Products supplied</label><input name="products_supplied" value="<%= row.products_supplied || '' %>" placeholder="e.g. Asian Paints, MS rods, screws"></div>
+      <div class="col-span-full"><label>Products supplied</label><input name="products_supplied" value="<%= row.products_supplied || '' %>" placeholder="e.g. Asian Paints, MS rods, screws"></div>
       <div><label>Credit period (days)</label><input type="number" min="0" name="credit_days" value="<%= row.credit_days || 0 %>"></div>
     <% } %>
     <div>
       <label>Opening balance (₹)</label>
       <input type="number" step="0.01" name="opening_balance" value="<%= row.opening_balance || 0 %>">
-      <small class="muted"><%= kind === 'customers' ? 'Amount the customer already owed before using this system' : 'Amount already owed to the supplier' %></small>
+      <small class="text-gray-500"><%= kind === 'customers' ? 'Amount the customer already owed before using this system' : 'Amount already owed to the supplier' %></small>
     </div>
   </div>
   <p>
-    <button class="btn primary">Save</button>
+    <button class="btn btn-primary">Save</button>
     <a class="btn" href="/<%= kind %><%= row.id ? '/' + row.id : '' %>">Cancel</a>
   </p>
 </form>
