@@ -13,7 +13,7 @@
 </div>
 
 <div class="card">
-  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-[140px] [&_select]:min-w-[140px]" method="get">
+  <form class="mb-3 flex flex-wrap items-end gap-2 *:w-auto [&_input]:min-w-35 [&_select]:min-w-35" method="get">
     <select name="status">
       <option value="open" <%= status === 'open' ? 'selected' : '' %>>All open</option>
       <option value="all" <%= status === 'all' ? 'selected' : '' %>>Everything</option>
